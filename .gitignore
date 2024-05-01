@@ -4,8 +4,7 @@
 *.pyd
 __pycache__/
 
-# Django media
-media/
+
 
 # Django static files
 staticfiles/
