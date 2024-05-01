@@ -1,0 +1,48 @@
+# Django project files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Django media
+media/
+
+# Django static files
+staticfiles/
+
+# Django database
+db.sqlite3
+
+# Django secret key
+secret_key.txt
+
+# Django development settings
+*.env
+venv/
+/venv/
+
+# Django logs
+logs/
+
+# Django test database
+test_db.sqlite3
+
+
+# Django local settings
+local_settings.py
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore cache and temporary files
+*.swp
+*~
+.DS_Store

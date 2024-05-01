@@ -3,6 +3,9 @@ from .models import Shirt,Tshirt,Tag
 
 # Register your models here.
 
-admin.site.register(Shirt)
+class ShirtAdmin(admin.ModelAdmin):
+    readonly_fields = ['type']
+
+admin.site.register(Shirt , ShirtAdmin)
 admin.site.register(Tag)
-admin.site.register(Tshirt)
+admin.site.register(Tshirt, ShirtAdmin)

@@ -25,6 +25,43 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <script>
+    function handleFilter(event) {
+    event.preventDefault();
+    var filter = event.currentTarget.getAttribute('href').split('=')[0];
+    var value = event.currentTarget.getAttribute('href').split('=')[1];
+    var currentUrl = window.location.href;
+
+    if (filter === 'tag') {
+        var tags = getTagsFromUrl(currentUrl);
+        if (tags) {
+            value = tags + "," + value;
+        }
+    }
+
+    var separator = currentUrl.includes('?') ? '&' : '?';
+    var filterExists = new RegExp(`${filter}=[^&]*`).test(currentUrl);
+
+    var newUrl;
+    if (filterExists) {
+        newUrl = currentUrl.replace(new RegExp(`${filter}=[^&]*`), `${filter}=${value}`);
+    } else {
+        newUrl = currentUrl + separator + `${filter}=${value}`;
+    }
+
+    window.location.href = newUrl;
+}
+function getTagsFromUrl(url) {
+    var params = new URLSearchParams(url.split('?')[1]);
+    if (params.has('tag')) {
+        return params.get('tag');
+    }
+    return null;
+}
+
+
+    </script>
 </head>
 
 <body>
@@ -33,19 +70,20 @@
        
         <div class="row align-items-center py-3 px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
-                <a href="" class="text-decoration-none">
+                <a href="/" class="text-decoration-none">
                     <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border ps-3 mr-0">G</span>lyph</h1>
                 </a>
             </div>
             <div class="col-lg-6 col-6 text-left">
-                <form action="">
+                <form  method="post">
+                    {% csrf_token %}
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for products">
-                        <div class="input-group-append">
+                        <input type="text" class="form-control" name="query" placeholder="Search for products">
+                        <button type="submit" style="border: none; outline: none;background-color: inherit; display: flex;" class="input-group-append">
                             <span class="input-group-text bg-transparent text-primary">
                                 <i class="fa fa-search"></i>
                             </span>
-                        </div>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -69,28 +107,39 @@
         <div class="row border-top px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
                 <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100" data-toggle="collapse" href="#navbar-vertical" style="height: 65px; margin-top: -1px; padding: 0 30px;">
-                    <h6 class="m-0">Categories</h6>
+                    <h6 class="m-0">Preferences</h6>
                     <i class="fa fa-angle-down text-dark"></i>
                 </a>
                 <nav class="collapse show navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0" id="navbar-vertical">
                     <div class="navbar-nav w-100 overflow-hidden" style="height: 410px">
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link" data-toggle="dropdown">Dresses <i class="fa fa-angle-down float-right mt-1"></i></a>
+                            <a href="#" class="nav-link" data-toggle="dropdown">Type <i class="fa fa-angle-down float-right mt-1"></i></a>
                             <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="" class="dropdown-item">Men's Dresses</a>
-                                <a href="" class="dropdown-item">Women's Dresses</a>
-                                <a href="" class="dropdown-item">Baby's Dresses</a>
+                                <a onclick="handleFilter(event)" href="type=shirt" class="dropdown-item">Shirt</a>
+                                <a onclick="handleFilter(event)" href="type=tshirt" class="dropdown-item">Tshirt</a>
                             </div>
                         </div>
-                        <a href="" class="nav-item nav-link">Shirts</a>
-                        <a href="" class="nav-item nav-link">Jeans</a>
-                        <a href="" class="nav-item nav-link">Swimwear</a>
-                        <a href="" class="nav-item nav-link">Sleepwear</a>
-                        <a href="" class="nav-item nav-link">Sportswear</a>
-                        <a href="" class="nav-item nav-link">Jumpsuits</a>
-                        <a href="" class="nav-item nav-link">Blazers</a>
-                        <a href="" class="nav-item nav-link">Jackets</a>
-                        <a href="" class="nav-item nav-link">Shoes</a>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link" data-toggle="dropdown">Color <i class="fa fa-angle-down float-right mt-1"></i></a>
+                            <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
+                                <a onclick="handleFilter(event)" href="color=red" class="dropdown-item">Red</a>
+                                <a onclick="handleFilter(event)" href="color=blue" class="dropdown-item">Blue</a>
+                                <a onclick="handleFilter(event)" href="color=white" class="dropdown-item">White</a>
+                                <a onclick="handleFilter(event)" href="color=green" class="dropdown-item">Green</a>
+                                <a onclick="handleFilter(event)" href="color=black" class="dropdown-item">Black</a>
+                                <a onclick="handleFilter(event)" href="color=gray" class="dropdown-item">Gray</a>
+                            </div>
+                        </div>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link" data-toggle="dropdown">Tags <i class="fa fa-angle-down float-right mt-1"></i></a>
+                            <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
+                                {% for tag in tags %}
+
+                                <a onclick="handleFilter(event)" href="tag={{ tag.name }}" class="dropdown-item">{{ tag.name }}</a>
+
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                 </nav>
             </div>
@@ -119,6 +168,12 @@
                       </div>
                     {% endif %}
                     {% endfor %}
+
+                                
+
+                    {% if not items %}
+                        <h2>No Products</h2>
+                    {% endif  %}
            
                   </div>
               </div>
@@ -159,7 +214,7 @@
             </div>
             {% endif %}
             {% endfor %}
-            
+
         </div>
     </div>
     <!-- Products End -->
